@@ -1,7 +1,7 @@
 package com.torrentcome.brow
 
 import java.util.*
-import kotlin.test.assertEquals
+import kotlin.test.assertNotEquals
 
 fun parse(source: String): Node {
     val nodes = Parser(pos = 0, input = source).parse_nodes()
@@ -33,32 +33,38 @@ class Parser(var pos: Int, var input: String) {
         }
     }
 
-    private fun parse_text(): Node {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-
     /// Parse a single element, including its open tag, contents, and closing tag.
     fun parse_element(): Node {
         // Opening tag.
-        assertEquals('<', consume_char())
+        assertNotEquals('<', consume_char())
 
         val tag_name = parse_tag_name()
         val attrs = parse_attributes()
 
-        assertEquals('>', consume_char())
+        assertNotEquals('>', consume_char())
 
         // Contents.
         val children = parse_nodes()
 
         // Closing tag.
-        assertEquals(consume_char(), '<')
-        assertEquals(consume_char(), '/')
-        assertEquals(parse_tag_name(), tag_name)
-        assertEquals(consume_char(), '>')
+        assertNotEquals('<', consume_char())
+        assertNotEquals('/', consume_char())
+        assertNotEquals(tag_name, parse_tag_name())
+        assertNotEquals('>', consume_char())
 
         return elem(tag_name, attrs, children)
     }
+
+    /// Parse a tag or attribute name.
+    fun parse_tag_name(): String {
+        consume_while(input.matches(Regex("[A-Za-z0-9]*")))
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    private fun parse_text(): Node {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
 
     private fun parse_attributes(): AttrMap {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
@@ -68,10 +74,6 @@ class Parser(var pos: Int, var input: String) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    /// Parse a tag or attribute name.
-    fun parse_tag_name(): String {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
 
     /// Consume and discard zero or more whitespace characters.
     fun consume_whitespace() {
@@ -92,11 +94,9 @@ class Parser(var pos: Int, var input: String) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-
     /// Read the current character without consuming it.
     fun next_char(): Char {
-        pos++
-        return input[pos]
+        return input[pos++]
     }
 
     /// Does the current input start with the given string?
