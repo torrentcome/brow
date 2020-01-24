@@ -1,7 +1,6 @@
 package com.torrentcome.brow
 
 import java.util.*
-import kotlin.collections.HashMap
 import kotlin.collections.HashSet
 
 typealias AttrMap = HashMap<String, String>
@@ -12,7 +11,6 @@ abstract class NodeType {
     class Element(val elementData: ElementData) : NodeType()
     class Text(val string: String) : NodeType()
 }
-
 
 class ElementData(tag_name: String, var attributes: AttrMap) {
     fun id(): String? {
@@ -29,19 +27,18 @@ class ElementData(tag_name: String, var attributes: AttrMap) {
     }
 }
 
-
 fun text(data: String): Node {
     return Node(children = Vector(), nodeType = NodeType.Text(data))
 }
 
 fun elem(name: String, attrs: AttrMap, children: Vector<Node>): Node {
     return Node(
-        children = children,
-        nodeType = NodeType.Element(
-            ElementData(
-                tag_name = name,
-                attributes = attrs
+            children = children,
+            nodeType = NodeType.Element(
+                    ElementData(
+                            tag_name = name,
+                            attributes = attrs
+                    )
             )
-        )
     )
 }
