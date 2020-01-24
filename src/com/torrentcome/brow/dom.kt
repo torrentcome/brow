@@ -1,3 +1,5 @@
+package com.torrentcome.brow
+
 import java.util.*
 import kotlin.collections.HashMap
 import kotlin.collections.HashSet
@@ -32,9 +34,14 @@ fun text(data: String): Node {
     return Node(children = Vector(), nodeType = NodeType.Text(data))
 }
 
-fun elemen(name: String, attrs: AttrMap, children: Vector<Node>): Node {
+fun elem(name: String, attrs: AttrMap, children: Vector<Node>): Node {
     return Node(
         children = children,
-        nodeType = NodeType.Element(ElementData(tag_name = name, attributes = attrs))
+        nodeType = NodeType.Element(
+            ElementData(
+                tag_name = name,
+                attributes = attrs
+            )
+        )
     )
 }
