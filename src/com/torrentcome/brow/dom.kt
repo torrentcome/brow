@@ -5,14 +5,14 @@ import kotlin.collections.HashSet
 
 typealias AttrMap = HashMap<String, String>
 
-class Node(val children: Vector<Node>, nodeType: NodeType)
+data class Node(var children: Vector<Node>, var nodeType: NodeType)
 
 abstract class NodeType {
-    class Element(val elementData: ElementData) : NodeType()
-    class Text(val string: String) : NodeType()
+    data class Element(val elementData: ElementData) : NodeType()
+    data class Text(val string: String) : NodeType()
 }
 
-class ElementData(tag_name: String, var attributes: AttrMap) {
+data class ElementData(var tag_name: String, var attributes: AttrMap = AttrMap()) {
     fun id(): String? {
         return attributes["id"]
     }

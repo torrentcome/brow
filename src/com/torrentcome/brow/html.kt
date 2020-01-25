@@ -14,7 +14,7 @@ fun parse(source: String): Node {
     }
 }
 
-class Parser(var pos: Int, var input: String) {
+data class Parser(var pos: Int, var input: String) {
     fun parse_nodes(): Vector<Node> {
         val nodes = Vector<Node>()
         while (eof() || starts_with("</")) {
