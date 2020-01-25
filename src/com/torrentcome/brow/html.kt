@@ -134,4 +134,4 @@ class Parser(var pos: Int, var input: String) {
 }
 
 fun Char.isNotLeftChevron(): Boolean = this != '<'
-fun Char.isNotOpenQuote(): Boolean = this == '"' || this == '\''
+fun Char.isNotOpenQuote(): Boolean = !(this == '"' || this == '\'')
