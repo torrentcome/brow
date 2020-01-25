@@ -59,9 +59,10 @@ class Parser(var pos: Int, var input: String) {
         return consume_while(Char::isLetterOrDigit)
     }
 
+    /// Parse a list of name="value" pairs, separated by whitespace.
     private fun parse_attributes(): AttrMap {
         val attributes = HashMap<String, String>()
-        while (next_char() != '>') {
+        while (next_char() == '>') {
             consume_whitespace()
             val (name, value) = parse_attr()
             attributes[name] = value
@@ -71,8 +72,20 @@ class Parser(var pos: Int, var input: String) {
 
     data class DestructiveNameValue(val name: String, val value: String)
 
+    /// Parse a single name="value" pair.
     private fun parse_attr(): DestructiveNameValue {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        val name = parse_tag_name()
+        assertEquals('=', consume_char())
+        val value = parse_attr_value()
+        return DestructiveNameValue(name, value)
+    }
+
+    private fun parse_attr_value(): String {
+        val open_quote = consume_char()
+        assert(open_quote == '"' || open_quote == '\'')
+        val value = consume_while(Char::isNotOpenQuote)
+        assertEquals(open_quote, consume_char())
+        return value
     }
 
     // Parse a text node.
@@ -121,3 +134,4 @@ class Parser(var pos: Int, var input: String) {
 }
 
 fun Char.isNotLeftChevron(): Boolean = this != '<'
+fun Char.isNotOpenQuote(): Boolean = this == '"' || this == '\''
