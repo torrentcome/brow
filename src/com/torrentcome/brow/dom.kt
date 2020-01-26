@@ -29,18 +29,20 @@ data class ElementData(var tag_name: String, var attributes: AttrMap = AttrMap()
     }
 }
 
-fun text(data: String): Node {
-    return Node(children = Vector(), nodeType = NodeType.Text(data))
-}
+object Dom {
+    fun text(data: String): Node {
+        return Node(children = Vector(), nodeType = NodeType.Text(data))
+    }
 
-fun elem(name: String, attrs: AttrMap, children: Vector<Node>): Node {
-    return Node(
-            children = children,
-            nodeType = NodeType.Element(
-                    ElementData(
-                            tag_name = name,
-                            attributes = attrs
-                    )
-            )
-    )
+    fun elem(name: String, attrs: AttrMap, children: Vector<Node>): Node {
+        return Node(
+                children = children,
+                nodeType = NodeType.Element(
+                        ElementData(
+                                tag_name = name,
+                                attributes = attrs
+                        )
+                )
+        )
+    }
 }

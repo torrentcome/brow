@@ -12,11 +12,11 @@ class HelloKotlin {
             val root = Node(Vector(), NodeType.Element(ElementData("html")))
             val body = Node(Vector(), NodeType.Element(ElementData("body")))
             root.children.addElement(body)
-            body.children.addElement(text("Hello, world!"))
+            body.children.addElement(Dom.text("Hello, world!"))
             println("$root")
             println("******** parse *********")
             val s = "<html><body>Hello, world!</body></html>"
-            val parse = parse(s)
+            val parse = Html.parse(s)
             println("$parse")
             println("******** assert *********")
             assertEquals(root, parse)
