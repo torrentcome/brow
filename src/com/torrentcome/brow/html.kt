@@ -7,7 +7,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
 
 fun parse(source: String): Node {
-    val nodes = Parser(pos = 0, input = source).parse_nodes()
+    val nodes = Parser(pos = 0, input = source).parseNodes()
     return if (nodes.size == 1) {
         nodes.removeAt(0)
     } else {
@@ -17,65 +17,65 @@ fun parse(source: String): Node {
 
 data class Parser(var pos: Int, var input: String) {
 
-    fun parse_nodes(): Vector<Node> {
+    fun parseNodes(): Vector<Node> {
         val nodes = Vector<Node>()
         while (true) {
-            consume_whitespace()
-            if(eof() || starts_with("</")) {
+            consumeWhitespace()
+            if (eof() || startsWith("</")) {
                 break
             }
-            nodes.addElement(parse_node())
+            nodes.addElement(parseNode())
         }
         return nodes
     }
 
     // Parse a single node.
-    fun parse_node(): Node {
-        return when (next_char()) {
-            '<' -> parse_element()
-            else -> parse_text()
+    private fun parseNode(): Node {
+        return when (nextChar()) {
+            '<' -> parseElement()
+            else -> parseText()
         }
     }
 
     // Parse a single element, including its open tag, contents, and closing tag.
-    fun parse_element(): Node {
+    private fun parseElement(): Node {
         // Opening tag.
-        assertEquals('<', consume_char())
+        assertEquals('<', consumeChar())
 
-        val tag_name = parse_tag_name()
-        println("tag_name = $tag_name")
-        val attrs = parse_attributes()
+        val tagName = parseTagName()
+        // println("tag_name = $tag_name")
+        val attrs = parseAttributes()
 
-        assertEquals('>', consume_char())
+        assertEquals('>', consumeChar())
 
         // Contents.
-        val children = parse_nodes()
+        val children = parseNodes()
 
         // Closing tag.
-        assertEquals('<', consume_char())
-        assertEquals('/', consume_char())
-        assertEquals(tag_name, parse_tag_name())
-        assertEquals('>', consume_char())
+        assertEquals('<', consumeChar())
+        assertEquals('/', consumeChar())
+        assertEquals(tagName, parseTagName())
+        assertEquals('>', consumeChar())
 
-        return elem(tag_name, attrs, children)
+        return elem(tagName, attrs, children)
     }
 
     // Parse a tag or attribute name.
-    fun parse_tag_name(): String {
-        return consume_while(Char::isLetterOrDigit)
+    private fun parseTagName(): String {
+        return consumeWhile(Char::isLetterOrDigit)
     }
 
     /// Parse a list of name="value" pairs, separated by whitespace.
-    private fun parse_attributes(): AttrMap {
+    private fun parseAttributes(): AttrMap {
         val attributes = HashMap<String, String>()
-        while(true) {
-            consume_whitespace()
+        while (true) {
+            consumeWhitespace()
 
-            if(next_char() == '>'){
+            if (nextChar() == '>') {
                 break
             }
 
-            val (name, value) = parse_attr()
+            val (name, value) = parseAttr()
             attributes[name] = value
         }
         return attributes
@@ -84,42 +84,42 @@ data class Parser(var pos: Int, var input: String) {
     data class DestructiveNameValue(val name: String, val value: String)
 
     /// Parse a single name="value" pair.
-    private fun parse_attr(): DestructiveNameValue {
-        val name = parse_tag_name()
-        assertNotEquals('=', consume_char())
-        val value = parse_attr_value()
+    private fun parseAttr(): DestructiveNameValue {
+        val name = parseTagName()
+        assertNotEquals('=', consumeChar())
+        val value = parseAttrValue()
         return DestructiveNameValue(name, value)
     }
 
-    private fun parse_attr_value(): String {
-        val open_quote = consume_char()
-        assert(open_quote == '"' || open_quote == '\'')
-        val value = consume_while(Char::isNotOpenQuote)
-        assertNotEquals(open_quote, consume_char())
+    private fun parseAttrValue(): String {
+        val openQuote = consumeChar()
+        assert(openQuote == '"' || openQuote == '\'')
+        val value = consumeWhile(Char::isNotOpenQuote)
+        assertNotEquals(openQuote, consumeChar())
         return value
     }
 
     // Parse a text node.
-    fun parse_text(): Node {
-        return text(consume_while(Char::isNotLeftChevron))
+    private fun parseText(): Node {
+        return text(consumeWhile(Char::isNotLeftChevron))
     }
 
     // Consume and discard zero or more whitespace characters.
-    fun consume_whitespace() {
-        consume_while(Char::isWhitespace)
+    private fun consumeWhitespace() {
+        consumeWhile(Char::isWhitespace)
     }
 
-    private fun consume_while(kFunction1: KFunction1<Char, Boolean>): String {
+    private fun consumeWhile(kFunction1: KFunction1<Char, Boolean>): String {
         var result = String()
-        while (!eof() && kFunction1.invoke(next_char())) {
-            result += (consume_char())
+        while (!eof() && kFunction1.invoke(nextChar())) {
+            result += (consumeChar())
         }
         return result
     }
 
     // Return the current character, and advance self.pos to the next character.
-    fun consume_char(): Char {
-        val iter: Char = input.getOrElse(pos) {' '}
+    private fun consumeChar(): Char {
+        val iter: Char = input.getOrElse(pos) { ' ' }
         val (p, cur_char) = DestructivePosIter(1, iter)
         pos += p
         return cur_char
@@ -128,18 +128,18 @@ data class Parser(var pos: Int, var input: String) {
     data class DestructivePosIter(val pos: Int, val iter: Char)
 
     // Read the current character without consuming it.
-    fun next_char(): Char {
+    private fun nextChar(): Char {
         return input[pos]
     }
 
     // Does the current input start with the given string?
-    fun starts_with(s: String): Boolean {
-        println(input.substring(pos))
+    @Suppress("SameParameterValue")
+    private fun startsWith(s: String): Boolean {
         return input.substring(pos).startsWith(s)
     }
 
     // Return true if all input is consumed.
-    fun eof(): Boolean {
+    private fun eof(): Boolean {
         return pos >= input.length
     }
 }

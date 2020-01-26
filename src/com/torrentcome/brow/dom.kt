@@ -13,10 +13,12 @@ abstract class NodeType {
 }
 
 data class ElementData(var tag_name: String, var attributes: AttrMap = AttrMap()) {
+    @Suppress("unused")
     fun id(): String? {
         return attributes["id"]
     }
 
+    @Suppress("unused")
     fun classes(): HashSet<String> {
         val classList: String? = attributes["class"]
         return when (classList) {
