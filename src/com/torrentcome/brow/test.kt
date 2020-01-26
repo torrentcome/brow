@@ -12,7 +12,11 @@ class HelloKotlin {
             root.children.addElement(body)
             body.children.addElement(text("Hello, world!"))
             println("$root")
-            println("******** html *********")
+            println("******** parse *********")
+            // <html><body>Hello, world!</body></html>
+            val s = "<html><body>Hello, world!</body></html>"
+            val parse = parse(s)
+            println("$parse")
         }
     }
 }

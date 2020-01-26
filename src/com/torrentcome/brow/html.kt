@@ -4,6 +4,7 @@ import java.util.*
 import kotlin.collections.HashMap
 import kotlin.reflect.KFunction1
 import kotlin.test.assertEquals
+import kotlin.test.assertNotEquals
 
 fun parse(source: String): Node {
     val nodes = Parser(pos = 0, input = source).parse_nodes()
@@ -15,10 +16,14 @@ fun parse(source: String): Node {
 }
 
 data class Parser(var pos: Int, var input: String) {
+
     fun parse_nodes(): Vector<Node> {
         val nodes = Vector<Node>()
-        while (eof() || starts_with("</")) {
+        while (true) {
             consume_whitespace()
+            if(eof() || starts_with("</")) {
+                break
+            }
             nodes.addElement(parse_node())
         }
         return nodes
@@ -38,6 +43,7 @@ data class Parser(var pos: Int, var input: String) {
         assertEquals('<', consume_char())
 
         val tag_name = parse_tag_name()
+        println("tag_name = $tag_name")
         val attrs = parse_attributes()
 
         assertEquals('>', consume_char())
@@ -62,8 +68,13 @@ data class Parser(var pos: Int, var input: String) {
     /// Parse a list of name="value" pairs, separated by whitespace.
     private fun parse_attributes(): AttrMap {
         val attributes = HashMap<String, String>()
-        while (next_char() == '>') {
+        while(true) {
             consume_whitespace()
+
+            if(next_char() == '>'){
+                break
+            }
+
             val (name, value) = parse_attr()
             attributes[name] = value
         }
@@ -75,7 +86,7 @@ data class Parser(var pos: Int, var input: String) {
     /// Parse a single name="value" pair.
     private fun parse_attr(): DestructiveNameValue {
         val name = parse_tag_name()
-        assertEquals('=', consume_char())
+        assertNotEquals('=', consume_char())
         val value = parse_attr_value()
         return DestructiveNameValue(name, value)
     }
@@ -84,7 +95,7 @@ data class Parser(var pos: Int, var input: String) {
         val open_quote = consume_char()
         assert(open_quote == '"' || open_quote == '\'')
         val value = consume_while(Char::isNotOpenQuote)
-        assertEquals(open_quote, consume_char())
+        assertNotEquals(open_quote, consume_char())
         return value
     }
 
@@ -99,19 +110,18 @@ data class Parser(var pos: Int, var input: String) {
     }
 
     private fun consume_while(kFunction1: KFunction1<Char, Boolean>): String {
-        val result = String()
+        var result = String()
         while (!eof() && kFunction1.invoke(next_char())) {
-            result.plus(consume_char())
+            result += (consume_char())
         }
         return result
     }
 
     // Return the current character, and advance self.pos to the next character.
     fun consume_char(): Char {
-        val iter: Char = input[pos]
-        val (_, cur_char) = DestructivePosIter(pos, iter)
-        val (next_pos, _) = DestructivePosIter(1, ' ')
-        pos += next_pos
+        val iter: Char = input.getOrElse(pos) {' '}
+        val (p, cur_char) = DestructivePosIter(1, iter)
+        pos += p
         return cur_char
     }
 
@@ -124,6 +134,7 @@ data class Parser(var pos: Int, var input: String) {
 
     // Does the current input start with the given string?
     fun starts_with(s: String): Boolean {
+        println(input.substring(pos))
         return input.substring(pos).startsWith(s)
     }
 
@@ -134,4 +145,4 @@ data class Parser(var pos: Int, var input: String) {
 }
 
 fun Char.isNotLeftChevron(): Boolean = this != '<'
-fun Char.isNotOpenQuote(): Boolean = !(this == '"' || this == '\'')
+fun Char.isNotOpenQuote(): Boolean = this != '"' && this != '\''
