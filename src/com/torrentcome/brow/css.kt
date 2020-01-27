@@ -1,7 +1,9 @@
 package com.torrentcome.brow
 
+import java.lang.Exception
 import java.util.*
 import kotlin.reflect.KFunction1
+import kotlin.test.assertEquals
 
 data class Stylesheet(var rules: Vector<Rule>)
 
@@ -38,21 +40,26 @@ abstract class Value {
 }
 
 open class Color(
-        var r: Byte = -1,
-        var g: Byte = -1,
-        var b: Byte = -1,
-        var a: Byte = -1)
+    var r: Byte = -1,
+    var g: Byte = -1,
+    var b: Byte = -1,
+    var a: Byte = -1
+)
 
 class Copy : Color()
 
 data class Specificity(var a: Int, var b: Int, var c: Int)
 
+abstract class Unit{
+    class Px
+}
+
 /// Parse a whole CSS stylesheet.
 object Css {
 
     fun parse(source: String): Stylesheet {
-        val parser = Parser (pos= 0, input= source )
-        return Stylesheet (rules= parser.parse_rules())
+        val parser = Parser(pos = 0, input = source)
+        return Stylesheet(rules = parser.parse_rules())
     }
 
     data class Parser(var pos: Int, var input: String) {
@@ -68,32 +75,38 @@ object Css {
             }
             return rules
         }
-
-        // Consume and discard zero or more whitespace characters.
-        private fun consumeWhitespace() {
-            consumeWhile(Char::isWhitespace)
-        }
-
-        private fun consumeWhile(kFunction1: KFunction1<Char, Boolean>): String {
-            var result = String()
-            while (!eof() && kFunction1.invoke(nextChar())) {
-                result += (consumeChar())
-            }
-            return result
-        }
 */
 
         fun parse_rules(): Vector<Rule> {
             TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
         }
 
-        // Return the current character, and advance self.pos to the next character.
-        private fun consumeChar(): Char {
-            val iter: Char = input.getOrElse(pos) { ' ' }
-            val (p, cur_char) = DestructivePosIter(1, iter)
-            pos += p
-            return cur_char
+        fun parse_unit(s : String): Unit {
+            return when (parseIdentifier().toLowerCase()) {
+                "px" -> Unit.Px() as Unit
+                else -> throw Exception()
+            }
         }
+
+        fun parseColor(): Value.ColorValue {
+            assertEquals('#', consumeChar())
+            return Value.ColorValue(
+                Color(
+                    r = parse_hex_pair(),
+                    g = parse_hex_pair(),
+                    b = parse_hex_pair(),
+                    a = 255.toByte()
+                )
+            )
+        }
+
+        fun parse_hex_pair(): Byte {
+            val s = input.subSequence(pos, pos + 2)
+            pos += 2
+            return s.toString().toByte(16)
+        }
+
+        data class DestructivePosIter(val pos: Int, val iter: Char)
 
         // Parse a text node.
         private fun parseIdentifier(): String {
@@ -114,7 +127,13 @@ object Css {
             return result
         }
 
-        data class DestructivePosIter(val pos: Int, val iter: Char)
+        // Return the current character, and advance self.pos to the next character.
+        private fun consumeChar(): Char {
+            val iter: Char = input.getOrElse(pos) { ' ' }
+            val (p, cur_char) = DestructivePosIter(1, iter)
+            pos += p
+            return cur_char
+        }
 
         // Read the current character without consuming it.
         private fun nextChar(): Char {
@@ -128,4 +147,4 @@ object Css {
     }
 }
 
-fun Char.validIdentiferChar(): Boolean = this.isLetterOrDigit() || this == '-'|| this == '_'
+fun Char.validIdentiferChar(): Boolean = this.isLetterOrDigit() || this == '-' || this == '_'
