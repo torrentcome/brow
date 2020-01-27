@@ -83,13 +83,49 @@ object Css {
         }
 */
 
+        fun parse_rules(): Vector<Rule> {
+            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        }
+
+        // Return the current character, and advance self.pos to the next character.
+        private fun consumeChar(): Char {
+            val iter: Char = input.getOrElse(pos) { ' ' }
+            val (p, cur_char) = DestructivePosIter(1, iter)
+            pos += p
+            return cur_char
+        }
+
+        // Parse a text node.
+        private fun parseIdentifier(): String {
+            return consumeWhile(Char::validIdentiferChar)
+        }
+
+        // Consume and discard zero or more whitespace characters.
+        private fun consumeWhitespace() {
+            consumeWhile(Char::isWhitespace)
+        }
+
+        /// Consume characters until `test` returns false.
+        private fun consumeWhile(kFunction1: KFunction1<Char, Boolean>): String {
+            var result = String()
+            while (!eof() && kFunction1.invoke(nextChar())) {
+                result += (consumeChar())
+            }
+            return result
+        }
+
+        data class DestructivePosIter(val pos: Int, val iter: Char)
+
+        // Read the current character without consuming it.
+        private fun nextChar(): Char {
+            return input[pos]
+        }
+
         // Return true if all input is consumed.
         private fun eof(): Boolean {
             return pos >= input.length
         }
-
-        fun parse_rules(): Vector<Rule> {
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-        }
     }
 }
+
+fun Char.validIdentiferChar(): Boolean = this.isLetterOrDigit() || this == '-'|| this == '_'
