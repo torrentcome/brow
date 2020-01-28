@@ -4,6 +4,9 @@ import java.util.*
 
 typealias PropertyMap = HashMap<String, Value?>
 
+/// A single CSS rule and the specificity of its most specific matching selector.
+data class MatchedRule(var specificity: Specificity, var rule: Rule)
+
 enum class Display {
     Inline,
     Block,
@@ -38,5 +41,28 @@ data class StyleNode<Any>(var node: Node, var specifiedValues: PropertyMap, var 
             }
             else -> Display.Inline
         }
+    }
+}
+
+class Style {
+
+    // Apply styles to a single element, returning the specified styles.
+    // To do: Allow multiple UA/author/user stylesheets, and implement the cascade.
+    fun specifiedValues(elem: ElementData, stylesheet: Stylesheet) : PropertyMap {
+        val values = PropertyMap()
+        val rules = matching_rules(elem, stylesheet)
+
+        // Go through the rules from lowest to highest specificity.
+        // rules.sortBy { it.selectors }
+        for (rule in rules) {
+            for (declaration in rule.declarations) {
+                values[declaration.name] = declaration.value
+            }
+        }
+        return values
+    }
+
+    private fun matching_rules(elem: ElementData, stylesheet: Stylesheet): Vector<Rule> {
+        return Vector()
     }
 }

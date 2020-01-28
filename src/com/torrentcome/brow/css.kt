@@ -85,8 +85,7 @@ object Css {
             loop@ while (true) {
                 selectors.addElement(Simple(parseSimpleSelector()))
                 consumeWhitespace()
-                val nextChar = nextChar()
-                when (nextChar) {
+                when (val nextChar = nextChar()) {
                     ',' -> {
                         consumeChar()
                         consumeWhitespace()
