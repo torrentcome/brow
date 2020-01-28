@@ -27,33 +27,32 @@ data class SimpleSelector(var tag_name: String?, var id: String?, var _class: Ve
 data class Declaration(var name: String, var value: Value)
 
 abstract class Value {
-    data class Keyword(var string: String)
-    data class Length(var f32: Float, var unit: Unit)
-    data class ColorValue(var color: Color)
-
     /// Return the size of a length in px, or zero for non-lengths.
-    fun toPx(value: Any?): Float {
+    fun toPx(value: Value?): Float {
         return when (value) {
-            is Value.Length -> value.f32
+            is Length -> value.f32
             else -> 0.0f
         }
     }
 }
 
+data class Keyword(var string: String) : Value()
+data class Length(var f32: Float, var unit: Unit) : Value()
+data class ColorValue(var color: Color) : Value()
+
 open class Color(
-        var r: Byte = -1,
-        var g: Byte = -1,
-        var b: Byte = -1,
-        var a: Byte = -1
+    var r: Long = -1,
+    var g: Long = -1,
+    var b: Long = -1,
+    var a: Long = -1
 )
 
 class Copy : Color()
 
 data class Specificity(var a: Int, var b: Int, var c: Int)
 
-abstract class Unit {
-    class Px
-}
+abstract class Unit
+class Px : Unit()
 
 /// Parse a whole CSS stylesheet.
 object Css {
@@ -100,36 +99,88 @@ object Css {
         }
 
         private fun parseSimpleSelector(): SimpleSelector {
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            val selector = SimpleSelector(tag_name = null, id = null, _class = Vector())
+            while (!eof()) {
+                if (nextChar() == '#') {
+                    consumeChar()
+                    selector.id = parseIdentifier()
+                } else if (nextChar() == '.') {
+                    consumeChar()
+                    selector._class.addElement(parseIdentifier())
+                } else if (nextChar() == '*') {
+                    consumeChar()
+                } else if (nextChar().validIdentiferChar()) {
+                    selector.tag_name = parseIdentifier()
+                } else {
+                    break
+                }
+            }
+            return selector
         }
 
         private fun parseDeclarations(): Vector<Declaration> {
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            assertEquals('{', consumeChar())
+            val declarations = Vector<Declaration>()
+            while (true) {
+                consumeWhitespace()
+                if (nextChar() == '}')
+                    break
+                declarations.addElement(parseDeclaration())
+            }
+            return declarations
         }
 
-        fun parseUnit(s: String): Unit {
+        private fun parseDeclaration(): Declaration {
+            val propertyName = parseIdentifier()
+            consumeWhitespace()
+            assertEquals(':', consumeChar())
+            consumeWhitespace()
+            val value = parseValue()
+            consumeWhitespace()
+            assertEquals(';', consumeChar())
+            return Declaration(name = propertyName, value = value)
+        }
+
+        private fun parseValue(): Value {
+            return when {
+                nextChar().isDigit() -> parseLength()
+                nextChar() == '#' -> parseColor()
+                else -> Keyword(parseIdentifier())
+            }
+        }
+
+        private fun parseLength(): Value {
+            return Length(parseFloat(), parseUnit())
+        }
+
+        private fun parseFloat(): Float {
+            val s = consumeWhile(Char::validDigitOrPoint)
+            return s.toFloat()
+        }
+
+        private fun parseUnit(): Unit {
             return when (parseIdentifier().toLowerCase()) {
-                "px" -> Unit.Px() as Unit
+                "px" -> Px()
                 else -> throw Exception()
             }
         }
 
-        fun parseColor(): Value.ColorValue {
+        private fun parseColor(): Value {
             assertEquals('#', consumeChar())
-            return Value.ColorValue(
-                    Color(
-                            r = parseHexPair(),
-                            g = parseHexPair(),
-                            b = parseHexPair(),
-                            a = 255.toByte()
-                    )
+            return ColorValue(
+                Color(
+                    r = parseHexPair(),
+                    g = parseHexPair(),
+                    b = parseHexPair(),
+                    a = 255.toLong()
+                )
             )
         }
 
-        fun parseHexPair(): Byte {
+        private fun parseHexPair(): Long {
             val s = input.subSequence(pos, pos + 2)
             pos += 2
-            return s.toString().toByte(16)
+            return s.toString().toLong(16)
         }
 
         data class DestructivePosIter(val pos: Int, val iter: Char)
@@ -174,3 +225,5 @@ object Css {
 }
 
 fun Char.validIdentiferChar(): Boolean = this.isLetterOrDigit() || this == '-' || this == '_'
+
+fun Char.validDigitOrPoint(): Boolean = this.isDigit() || this == '.'
