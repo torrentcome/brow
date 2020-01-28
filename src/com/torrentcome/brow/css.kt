@@ -82,16 +82,17 @@ object Css {
 
         private fun parseSelectors(): Vector<Selector> {
             val selectors = Vector<Selector>()
-            while (true) {
+            loop@ while (true) {
                 selectors.addElement(Simple(parseSimpleSelector()))
                 consumeWhitespace()
-                if (nextChar() == ',') {
-                    consumeChar()
-                    consumeWhitespace()
-                } else if (nextChar() == '{') {
-                    break
-                } else {
-                    throw Exception()
+                val nextChar = nextChar()
+                when (nextChar) {
+                    ',' -> {
+                        consumeChar()
+                        consumeWhitespace()
+                    }
+                    '{' -> break@loop
+                    else -> throw Exception("Unexpected character $nextChar in selector list")
                 }
             }
             selectors.sortedBy { it.specificity().toString() }
@@ -100,19 +101,22 @@ object Css {
 
         private fun parseSimpleSelector(): SimpleSelector {
             val selector = SimpleSelector(tag_name = null, id = null, _class = Vector())
-            while (!eof()) {
-                if (nextChar() == '#') {
-                    consumeChar()
-                    selector.id = parseIdentifier()
-                } else if (nextChar() == '.') {
-                    consumeChar()
-                    selector._class.addElement(parseIdentifier())
-                } else if (nextChar() == '*') {
-                    consumeChar()
-                } else if (nextChar().validIdentiferChar()) {
-                    selector.tag_name = parseIdentifier()
-                } else {
-                    break
+            loop@ while (!eof()) {
+                val nextChar = nextChar()
+                when {
+                    nextChar == '#' -> {
+                        consumeChar()
+                        selector.id = parseIdentifier()
+                    }
+                    nextChar == '.' -> {
+                        consumeChar()
+                        selector._class.addElement(parseIdentifier())
+                    }
+                    nextChar == '*' -> consumeChar()
+
+                    nextChar.validIdentiferChar() -> selector.tag_name = parseIdentifier()
+
+                    else -> break@loop
                 }
             }
             return selector
@@ -121,10 +125,12 @@ object Css {
         private fun parseDeclarations(): Vector<Declaration> {
             assertEquals('{', consumeChar())
             val declarations = Vector<Declaration>()
-            while (true) {
+            loop@ while (true) {
                 consumeWhitespace()
-                if (nextChar() == '}')
-                    break
+                if (nextChar() == '}') {
+                    consumeChar()
+                    break@loop
+                }
                 declarations.addElement(parseDeclaration())
             }
             return declarations
@@ -142,9 +148,10 @@ object Css {
         }
 
         private fun parseValue(): Value {
+            val nextChar = nextChar()
             return when {
-                nextChar().isDigit() -> parseLength()
-                nextChar() == '#' -> parseColor()
+                nextChar.isDigit() -> parseLength()
+                nextChar == '#' -> parseColor()
                 else -> Keyword(parseIdentifier())
             }
         }

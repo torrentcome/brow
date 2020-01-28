@@ -20,10 +20,10 @@ object Html {
 
         fun parseNodes(): Vector<Node> {
             val nodes = Vector<Node>()
-            while (true) {
+            loop@ while (true) {
                 consumeWhitespace()
                 if (eof() || startsWith("</")) {
-                    break
+                    break@loop
                 }
                 nodes.addElement(parseNode())
             }
@@ -69,11 +69,11 @@ object Html {
         /// Parse a list of name="value" pairs, separated by whitespace.
         private fun parseAttributes(): AttrMap {
             val attributes = HashMap<String, String>()
-            while (true) {
+            loop@ while (true) {
                 consumeWhitespace()
 
                 if (nextChar() == '>') {
-                    break
+                    break@loop
                 }
 
                 val (name, value) = parseAttr()
