@@ -66,10 +66,10 @@ object Css {
         /// Parse a list of rule sets, separated by optional whitespace.
         fun parseRules(): Vector<Rule> {
             val rules = Vector<Rule>()
-            while (true) {
+            loop@ while (true) {
                 consumeWhitespace()
                 if (eof()) {
-                    break
+                    break@loop
                 }
                 rules.addElement(parseRule())
             }
@@ -91,8 +91,12 @@ object Css {
                         consumeChar()
                         consumeWhitespace()
                     }
-                    '{' -> break@loop
-                    else -> throw Exception("Unexpected character $nextChar in selector list")
+                    '{' -> {
+                        break@loop
+                    }
+                    else -> {
+                        throw Exception("Unexpected character $nextChar in selector list")
+                    }
                 }
             }
             selectors.sortedBy { it.specificity().toString() }
@@ -112,10 +116,12 @@ object Css {
                         consumeChar()
                         selector._class.addElement(parseIdentifier())
                     }
-                    nextChar == '*' -> consumeChar()
-
-                    nextChar.validIdentiferChar() -> selector.tag_name = parseIdentifier()
-
+                    nextChar == '*' -> {
+                        consumeChar()
+                    }
+                    nextChar.validIdentiferChar() -> {
+                        selector.tag_name = parseIdentifier()
+                    }
                     else -> break@loop
                 }
             }
