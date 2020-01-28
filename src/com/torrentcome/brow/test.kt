@@ -3,7 +3,6 @@ package com.torrentcome.brow
 import java.util.*
 import kotlin.test.assertEquals
 
-
 class HelloKotlin {
     companion object {
         @JvmStatic
@@ -13,26 +12,28 @@ class HelloKotlin {
             val bodyDom = Node(Vector(), NodeType.Element(ElementData("body")))
             rootDom.children.addElement(bodyDom)
             bodyDom.children.addElement(Dom.text("Hello, world!"))
-            println("* dom = $rootDom")
+            println("* buildDom =")
+            println("$rootDom")
 
             val html = "<html><body>Hello, world!</body></html>"
             val parseHtml = Html.parse(html)
-            println("* parseHtml = $parseHtml")
+            println("* parseHtml = ")
+            println("$parseHtml")
             assertEquals(rootDom, parseHtml)
 
             val rule = Rule(buildSelectors(), buildDeclarations())
-
             val rules = Vector<Rule>()
             rules.addElement(rule)
-
             val stylesheet = Stylesheet(rules)
+            println("* stylesheet = ")
+            println("$stylesheet")
 
             val css = "h1, h2, h3 { margin: auto; color: #cc0000; }\n" +
                     "div.note { margin-bottom: 20px; padding: 10px; }\n" +
                     "#answer { display: none; }"
             val parseCss = Css.parse(css)
-            println("* parseCss = $parseCss")
-
+            println("* parseCss = ")
+            println("$parseCss")
         }
 
         private fun buildDeclarations(): Vector<Declaration> {

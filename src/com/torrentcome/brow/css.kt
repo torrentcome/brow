@@ -47,7 +47,7 @@ open class Color(
     var a: Long = -1
 )
 
-class Copy : Color()
+class Copy(r: Long, g: Long, b: Long, a: Long) : Color(r, g, b, a)
 
 data class Specificity(var a: Int, var b: Int, var c: Int)
 
