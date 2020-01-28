@@ -1,6 +1,5 @@
 package com.torrentcome.brow
 
-import java.lang.Exception
 import java.util.*
 import kotlin.reflect.KFunction1
 import kotlin.test.assertEquals
@@ -10,14 +9,16 @@ data class Stylesheet(var rules: Vector<Rule>)
 data class Rule(var selectors: Vector<Selector>, var declarations: Vector<Declaration>)
 
 abstract class Selector {
-    data class Simple(var simpleSelector: SimpleSelector) {
-        fun specificity(): Specificity {
-            // http://www.w3.org/TR/selectors/#specificity
-            val a: Int = simpleSelector.id?.length ?: 0
-            val b = simpleSelector._class.size
-            val c = simpleSelector.tag_name?.length ?: 0
-            return Specificity(a, b, c)
-        }
+    abstract fun specificity(): Specificity
+}
+
+data class Simple(var simpleSelector: SimpleSelector) : Selector() {
+    override fun specificity(): Specificity {
+        // http://www.w3.org/TR/selectors/#specificity
+        val a: Int = simpleSelector.id?.length ?: 0
+        val b = simpleSelector._class.size
+        val c = simpleSelector.tag_name?.length ?: 0
+        return Specificity(a, b, c)
     }
 }
 
@@ -31,7 +32,7 @@ abstract class Value {
     data class ColorValue(var color: Color)
 
     /// Return the size of a length in px, or zero for non-lengths.
-    fun to_px(value: Any?): Float {
+    fun toPx(value: Any?): Float {
         return when (value) {
             is Value.Length -> value.f32
             else -> 0.0f
@@ -40,17 +41,17 @@ abstract class Value {
 }
 
 open class Color(
-    var r: Byte = -1,
-    var g: Byte = -1,
-    var b: Byte = -1,
-    var a: Byte = -1
+        var r: Byte = -1,
+        var g: Byte = -1,
+        var b: Byte = -1,
+        var a: Byte = -1
 )
 
 class Copy : Color()
 
 data class Specificity(var a: Int, var b: Int, var c: Int)
 
-abstract class Unit{
+abstract class Unit {
     class Px
 }
 
@@ -59,29 +60,54 @@ object Css {
 
     fun parse(source: String): Stylesheet {
         val parser = Parser(pos = 0, input = source)
-        return Stylesheet(rules = parser.parse_rules())
+        return Stylesheet(rules = parser.parseRules())
     }
 
     data class Parser(var pos: Int, var input: String) {
         /// Parse a list of rule sets, separated by optional whitespace.
-        /*fun parse_rules() : Vector<Rule> {
+        fun parseRules(): Vector<Rule> {
             val rules = Vector<Rule>()
-            while(true) {
-                consume_whitespace()
+            while (true) {
+                consumeWhitespace()
                 if (eof()) {
                     break
                 }
-                rules.addElement(parse_rule())
+                rules.addElement(parseRule())
             }
             return rules
         }
-*/
 
-        fun parse_rules(): Vector<Rule> {
+        private fun parseRule(): Rule {
+            return Rule(selectors = parseSelectors(), declarations = parseDeclarations())
+        }
+
+        private fun parseSelectors(): Vector<Selector> {
+            val selectors = Vector<Selector>()
+            while (true) {
+                selectors.addElement(Simple(parseSimpleSelector()))
+                consumeWhitespace()
+                if (nextChar() == ',') {
+                    consumeChar()
+                    consumeWhitespace()
+                } else if (nextChar() == '{') {
+                    break
+                } else {
+                    throw Exception()
+                }
+            }
+            selectors.sortedBy { it.specificity().toString() }
+            return selectors
+        }
+
+        private fun parseSimpleSelector(): SimpleSelector {
             TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
         }
 
-        fun parse_unit(s : String): Unit {
+        private fun parseDeclarations(): Vector<Declaration> {
+            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        }
+
+        fun parseUnit(s: String): Unit {
             return when (parseIdentifier().toLowerCase()) {
                 "px" -> Unit.Px() as Unit
                 else -> throw Exception()
@@ -91,16 +117,16 @@ object Css {
         fun parseColor(): Value.ColorValue {
             assertEquals('#', consumeChar())
             return Value.ColorValue(
-                Color(
-                    r = parse_hex_pair(),
-                    g = parse_hex_pair(),
-                    b = parse_hex_pair(),
-                    a = 255.toByte()
-                )
+                    Color(
+                            r = parseHexPair(),
+                            g = parseHexPair(),
+                            b = parseHexPair(),
+                            a = 255.toByte()
+                    )
             )
         }
 
-        fun parse_hex_pair(): Byte {
+        fun parseHexPair(): Byte {
             val s = input.subSequence(pos, pos + 2)
             pos += 2
             return s.toString().toByte(16)
