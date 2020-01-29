@@ -90,7 +90,29 @@ class Style {
     }
 
     private fun matches(elem: ElementData, selector: Selector?): Boolean {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return when (selector) {
+            is Simple -> matches_simple_selector(elem, selector.simpleSelector)
+            else -> false
+        }
+    }
+
+    private fun matches_simple_selector(elem: ElementData, selector: SimpleSelector): Boolean {
+        // Check type selector
+        if (!selector.tag_name!!.contains(elem.tag_name)) {
+            return false
+        }
+
+        // Check ID selector
+        if (!selector.id!!.contains(elem.id().toString())) {
+            return false
+        }
+
+        // Check class selectors
+        val elem_classes: HashSet<String> = elem.classes()
+        // if(selector._class.map)
+
+        // We didn't find any non-matching selector components.
+       return true
     }
 
 }
