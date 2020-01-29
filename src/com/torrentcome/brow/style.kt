@@ -53,20 +53,23 @@ class Style {
     /// computed values too, including inherited values.
     fun styleTree(root: Node, stylesheet: Stylesheet): StyledNode {
         return StyledNode(
-                node = root,
-                specifiedValues = when (root.nodeType) {
-                    is NodeType.Element -> specifiedValues(elem = (root.nodeType as NodeType.Element).elementData, stylesheet = stylesheet)
-                    is NodeType.Text -> HashMap()
-                    else -> throw(Exception())
-                },
-                children = root.children.map { child -> styleTree(child, stylesheet) } as Vector<StyledNode>)
+            node = root,
+            specifiedValues = when (root.nodeType) {
+                is NodeType.Element -> specifiedValues(
+                    elem = (root.nodeType as NodeType.Element).elementData,
+                    stylesheet = stylesheet
+                )
+                is NodeType.Text -> HashMap()
+                else -> throw(Exception())
+            },
+            children = root.children.map { child -> styleTree(child, stylesheet) } as Vector<StyledNode>)
     }
 
     // Apply styles to a single element, returning the specified styles.
     // To do: Allow multiple UA/author/user stylesheets, and implement the cascade.
-    fun specifiedValues(elem: ElementData, stylesheet: Stylesheet): PropertyMap {
+    private fun specifiedValues(elem: ElementData, stylesheet: Stylesheet): PropertyMap {
         val values = PropertyMap()
-        val rules = matching_rules(elem, stylesheet)
+        val rules = matchingRules(elem, stylesheet)
 
         // Go through the rules from lowest to highest specificity.
         // rules.sortBy { it.selectors }
@@ -79,24 +82,24 @@ class Style {
         return values
     }
 
-    fun matching_rules(elem: ElementData, stylesheet: Stylesheet): Vector<MatchedRule?> {
-        val filter: List<MatchedRule?> = stylesheet.rules.map { e -> match_rule(elem, e) }
+    private fun matchingRules(elem: ElementData, stylesheet: Stylesheet): Vector<MatchedRule?> {
+        val filter: List<MatchedRule?> = stylesheet.rules.map { e -> matchRule(elem, e) }
         return filter as Vector<MatchedRule?>
     }
 
-    private fun match_rule(elem: ElementData, rule: Rule?): MatchedRule? {
+    private fun matchRule(elem: ElementData, rule: Rule?): MatchedRule? {
         val find: Selector? = rule?.selectors?.find { selector -> matches(elem, selector) }
         return find?.let { MatchedRule(it.specificity(), rule) }
     }
 
     private fun matches(elem: ElementData, selector: Selector?): Boolean {
         return when (selector) {
-            is Simple -> matches_simple_selector(elem, selector.simpleSelector)
+            is Simple -> matchesSimpleSelector(elem, selector.simpleSelector)
             else -> false
         }
     }
 
-    private fun matches_simple_selector(elem: ElementData, selector: SimpleSelector): Boolean {
+    private fun matchesSimpleSelector(elem: ElementData, selector: SimpleSelector): Boolean {
         // Check type selector
         if (!selector.tag_name!!.contains(elem.tag_name)) {
             return false
@@ -108,11 +111,13 @@ class Style {
         }
 
         // Check class selectors
-        val elem_classes: HashSet<String> = elem.classes()
-        // if(selector._class.map)
+        val elemClasses: HashSet<String> = elem.classes()
+        if (selector._class.any { _class -> !elemClasses.contains(_class) }) {
+            return false
+        }
 
         // We didn't find any non-matching selector components.
-       return true
+        return true
     }
 
 }
