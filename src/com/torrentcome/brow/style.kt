@@ -45,7 +45,7 @@ data class StyledNode(var node: Node, var specifiedValues: PropertyMap, var chil
     }
 }
 
-class Style {
+object Style {
 
     /// Apply a stylesheet to an entire DOM tree, returning a StyledNode tree.
     ///
@@ -73,10 +73,13 @@ class Style {
 
         // Go through the rules from lowest to highest specificity.
         // rules.sortBy { it.selectors }
-        rules.sortBy { i -> i!!.rule.declarations.toString() }
+        // rules.sortBy { i -> i!!.rule.declarations.toString() }
+
         for (rule in rules) {
-            for (declaration in rule!!.rule.declarations) {
-                values[declaration.name] = declaration.value
+            if(rule != null) {
+                for (declaration in rule.rule.declarations) {
+                    values[declaration.name] = declaration.value
+                }
             }
         }
         return values
@@ -84,7 +87,9 @@ class Style {
 
     private fun matchingRules(elem: ElementData, stylesheet: Stylesheet): Vector<MatchedRule?> {
         val filter: List<MatchedRule?> = stylesheet.rules.map { e -> matchRule(elem, e) }
-        return filter as Vector<MatchedRule?>
+        val filter2 = Vector<MatchedRule?>()
+        filter2.addAll(filter)
+        return filter2
     }
 
     private fun matchRule(elem: ElementData, rule: Rule?): MatchedRule? {
@@ -99,20 +104,20 @@ class Style {
         }
     }
 
-    private fun matchesSimpleSelector(elem: ElementData, selector: SimpleSelector): Boolean {
+    private fun matchesSimpleSelector(elem: ElementData, selector: SimpleSelector?): Boolean {
         // Check type selector
-        if (!selector.tag_name!!.contains(elem.tag_name)) {
+        if (selector?.tag_name != null && !selector.tag_name!!.contains(elem.tag_name)) {
             return false
         }
 
         // Check ID selector
-        if (!selector.id!!.contains(elem.id().toString())) {
+        if (selector?.id != null && !selector.id!!.contains(elem.id().toString())) {
             return false
         }
 
         // Check class selectors
         val elemClasses: HashSet<String> = elem.classes()
-        if (selector._class.any { _class -> !elemClasses.contains(_class) }) {
+        if (selector?._class != null &&selector._class.any { _class -> !elemClasses.contains(_class) }) {
             return false
         }
 

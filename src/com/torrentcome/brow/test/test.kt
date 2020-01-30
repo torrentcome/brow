@@ -57,6 +57,10 @@ class HelloKotlin {
             println("* parseCss2 = ")
             println("$parseCss2")
 
+            val styleTree: StyledNode = Style.styleTree(root = parseHtml2, stylesheet = parseCss2)
+            println("* styleTree = ")
+            println("$styleTree")
+
         }
     }
 }
