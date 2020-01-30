@@ -4,7 +4,6 @@ import java.util.*
 import kotlin.collections.HashMap
 import kotlin.reflect.KFunction1
 import kotlin.test.assertEquals
-import kotlin.test.assertNotEquals
 
 object Html {
     fun parse(source: String): Node {
@@ -87,7 +86,7 @@ object Html {
         /// Parse a single name="value" pair.
         private fun parseAttr(): DestructiveNameValue {
             val name = parseTagName()
-            assertNotEquals('=', consumeChar())
+            assertEquals('=', consumeChar())
             val value = parseAttrValue()
             return DestructiveNameValue(name, value)
         }
@@ -96,7 +95,7 @@ object Html {
             val openQuote = consumeChar()
             assert(openQuote == '"' || openQuote == '\'')
             val value = consumeWhile(Char::isNotOpenQuote)
-            assertNotEquals(openQuote, consumeChar())
+            assertEquals(openQuote, consumeChar())
             return value
         }
 
