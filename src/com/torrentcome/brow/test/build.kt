@@ -9,7 +9,6 @@ import java.util.*
 * "#answer { display: none; }"
 * Rule(selectors=[Simple(simpleSelector=SimpleSelector(tag_name=div, id=null, _class=[note]))], declarations=[Declaration(name=margin-bottom, value=Length(f32=20.0, unit=com.torrentcome.brow.Px@7b23ec81)), Declaration(name=padding, value=Length(f32=10.0, unit=com.torrentcome.brow.Px@6acbcfc0))]),
 * Rule(selectors=[Simple(simpleSelector=SimpleSelector(tag_name=null, id=answer, _class=[]))], declarations=[Declaration(name=display, value=Keyword(string=none))])])
-
 * */
 
 internal fun buildSelectors1(): Vector<Selector> {
