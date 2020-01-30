@@ -45,6 +45,8 @@ class HelloKotlin {
             val parseCss = Css.parse(css)
             println("* parseCss = ")
             println("$parseCss")
+            assertEquals(stylesheet, parseCss)
+
         }
 
 

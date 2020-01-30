@@ -27,15 +27,16 @@ internal fun buildSelectors1(): Vector<Selector> {
 internal fun buildDeclarations1(): Vector<Declaration> {
     val declaration1 = Declaration(name = "margin", value = Keyword("auto"))
     val declaration2 = Declaration(
-        name = "color",
-        value = ColorValue(
-            color =
-            Color(
-                r = "cc".toLong(16),
-                g = "00".toLong(16),
-                b = "00".toLong(16)
+            name = "color",
+            value = ColorValue(
+                    color =
+                    Color(
+                            r = "cc".toLong(16),
+                            g = "00".toLong(16),
+                            b = "00".toLong(16),
+                            a = 255
+                    )
             )
-        )
     )
 
     val declarations = Vector<Declaration>()

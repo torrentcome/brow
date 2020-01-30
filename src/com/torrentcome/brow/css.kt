@@ -40,19 +40,19 @@ data class Keyword(var string: String) : Value()
 data class Length(var f32: Float, var unit: Unit) : Value()
 data class ColorValue(var color: Color) : Value()
 
-open class Color(
+data class Color(
     var r: Long = -1,
     var g: Long = -1,
     var b: Long = -1,
     var a: Long = -1
 )
 
-class Copy(r: Long, g: Long, b: Long, a: Long) : Color(r, g, b, a)
+class Copy(r: Long, g: Long, b: Long, a: Long)
 
 data class Specificity(var a: Int, var b: Int, var c: Int)
 
 abstract class Unit
-class Px : Unit()
+data class Px(var param : Float = -1f) : Unit()
 
 /// Parse a whole CSS stylesheet.
 object Css {
