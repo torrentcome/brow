@@ -28,11 +28,13 @@ data class Declaration(var name: String, var value: Value)
 
 abstract class Value {
     /// Return the size of a length in px, or zero for non-lengths.
-    fun toPx(value: Value?): Float {
-        return when (value) {
-            is Length -> value.f32
-            else -> 0.0f
-        }
+
+}
+
+fun Value.toPx(): Float {
+    return when (this) {
+        is Length -> this.f32
+        else -> 0.0f
     }
 }
 
@@ -52,7 +54,7 @@ class Copy(r: Long, g: Long, b: Long, a: Long)
 data class Specificity(var a: Int, var b: Int, var c: Int)
 
 abstract class Unit
-data class Px(var param : Float = -1f) : Unit()
+data class Px(var param: Float = -1f) : Unit()
 
 /// Parse a whole CSS stylesheet.
 object Css {
