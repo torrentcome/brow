@@ -171,6 +171,7 @@ private fun LayoutBox.calculate_block_width(containing_block: Dimensions) {
             margin_left = Length(underflow / 2.0f, Px())
             margin_right = Length(underflow / 2.0f, Px())
         }
+        // 100 | 101 | 111
         else -> {
             if (margin_left == auto) {
                 margin_left = Length(0.0f, Px()); }
