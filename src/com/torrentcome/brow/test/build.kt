@@ -11,19 +11,19 @@ import java.util.*
 * Rule(selectors=[Simple(simpleSelector=SimpleSelector(tag_name=null, id=answer, _class=[]))], declarations=[Declaration(name=display, value=Keyword(string=none))])])
 * */
 
-internal fun buildSelectors1(): Vector<Selector> {
-    val selectorH1 = SimpleSelector(tag_name = "h1", id = null, _class = Vector())
-    val selectorH2 = SimpleSelector(tag_name = "h2", id = null, _class = Vector())
-    val selectorH3 = SimpleSelector(tag_name = "h3", id = null, _class = Vector())
+internal fun buildSelectors1(): ArrayList<Selector> {
+    val selectorH1 = SimpleSelector(tag_name = "h1", id = null, _class = ArrayList())
+    val selectorH2 = SimpleSelector(tag_name = "h2", id = null, _class = ArrayList())
+    val selectorH3 = SimpleSelector(tag_name = "h3", id = null, _class = ArrayList())
 
-    val selectors = Vector<Selector>()
-    selectors.addElement(Simple(selectorH1))
-    selectors.addElement(Simple(selectorH2))
-    selectors.addElement(Simple(selectorH3))
+    val selectors = ArrayList<Selector>()
+    selectors.add(Simple(selectorH1))
+    selectors.add(Simple(selectorH2))
+    selectors.add(Simple(selectorH3))
     return selectors
 }
 
-internal fun buildDeclarations1(): Vector<Declaration> {
+internal fun buildDeclarations1(): ArrayList<Declaration> {
     val declaration1 = Declaration(name = "margin", value = Keyword("auto"))
     val declaration2 = Declaration(
             name = "color",
@@ -38,48 +38,48 @@ internal fun buildDeclarations1(): Vector<Declaration> {
             )
     )
 
-    val declarations = Vector<Declaration>()
-    declarations.addElement(declaration1)
-    declarations.addElement(declaration2)
+    val declarations = ArrayList<Declaration>()
+    declarations.add(declaration1)
+    declarations.add(declaration2)
     return declarations
 }
 
-internal fun buildSelectors2(): Vector<Selector> {
+internal fun buildSelectors2(): ArrayList<Selector> {
 
-    val classNote = Vector<String>()
-    classNote.addElement("note")
+    val classNote = ArrayList<String>()
+    classNote.add("note")
     val selectorDivNote = SimpleSelector(tag_name = "div", id = null, _class = classNote)
 
-    val selectors = Vector<Selector>()
-    selectors.addElement(Simple(selectorDivNote))
+    val selectors = ArrayList<Selector>()
+    selectors.add(Simple(selectorDivNote))
 
     return selectors
 }
 
-internal fun buildDeclarations2(): Vector<Declaration> {
+internal fun buildDeclarations2(): ArrayList<Declaration> {
     val declarationMarginBottom = Declaration(name = "margin-bottom", value = Length(20f, Px()))
     val declarationPadding = Declaration(name = "padding", value = Length(10f, Px()))
 
-    val declarations = Vector<Declaration>()
-    declarations.addElement(declarationMarginBottom)
-    declarations.addElement(declarationPadding)
+    val declarations = ArrayList<Declaration>()
+    declarations.add(declarationMarginBottom)
+    declarations.add(declarationPadding)
     return declarations
 }
 
-internal fun buildSelectors3(): Vector<Selector> {
-    val selectorAnswer = SimpleSelector(tag_name = null, id = "answer", _class = Vector())
+internal fun buildSelectors3(): ArrayList<Selector> {
+    val selectorAnswer = SimpleSelector(tag_name = null, id = "answer", _class = ArrayList())
 
-    val selectors = Vector<Selector>()
-    selectors.addElement(Simple(selectorAnswer))
+    val selectors = ArrayList<Selector>()
+    selectors.add(Simple(selectorAnswer))
 
     return selectors
 }
 
 
-internal fun buildDeclarations3(): Vector<Declaration> {
+internal fun buildDeclarations3(): ArrayList<Declaration> {
     val declarationDisplay = Declaration(name = "display", value = Keyword("none"))
 
-    val declarations = Vector<Declaration>()
-    declarations.addElement(declarationDisplay)
+    val declarations = ArrayList<Declaration>()
+    declarations.add(declarationDisplay)
     return declarations
 }

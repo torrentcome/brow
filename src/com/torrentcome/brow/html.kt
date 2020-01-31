@@ -17,14 +17,14 @@ object Html {
 
     data class Parser(var pos: Int, var input: String) {
 
-        fun parseNodes(): Vector<Node> {
-            val nodes = Vector<Node>()
+        fun parseNodes(): ArrayList<Node> {
+            val nodes = ArrayList<Node>()
             loop@ while (true) {
                 consumeWhitespace()
                 if (eof() || startsWith("</")) {
                     break@loop
                 }
-                nodes.addElement(parseNode())
+                nodes.add(parseNode())
             }
             return nodes
         }

@@ -5,7 +5,7 @@ import kotlin.collections.HashSet
 
 typealias AttrMap = HashMap<String, String>
 
-data class Node(var children: Vector<Node>, var nodeType: NodeType)
+data class Node(var children: ArrayList<Node>, var nodeType: NodeType)
 
 abstract class NodeType {
     data class Element(val elementData: ElementData) : NodeType()
@@ -31,10 +31,10 @@ data class ElementData(var tag_name: String, var attributes: AttrMap = AttrMap()
 
 object Dom {
     fun text(data: String): Node {
-        return Node(children = Vector(), nodeType = NodeType.Text(data))
+        return Node(children = ArrayList(), nodeType = NodeType.Text(data))
     }
 
-    fun elem(name: String, attrs: AttrMap, children: Vector<Node>): Node {
+    fun elem(name: String, attrs: AttrMap, children: ArrayList<Node>): Node {
         return Node(
                 children = children,
                 nodeType = NodeType.Element(

@@ -14,7 +14,7 @@ enum class Display {
     None
 }
 
-data class StyledNode(var node: Node, var specifiedValues: PropertyMap, var children: Vector<StyledNode>) {
+data class StyledNode(var node: Node, var specifiedValues: PropertyMap, var children: ArrayList<StyledNode>) {
     // Return the specified value of a property if it exists, otherwise `None`.
     fun value(name: String): Value? {
         return specifiedValues[name]
@@ -62,7 +62,7 @@ object Style {
                 is NodeType.Text -> HashMap()
                 else -> throw(Exception())
             },
-            children = root.children.map { child -> styleTree(child, stylesheet) } as Vector<StyledNode>)
+            children = root.children.map { child -> styleTree(child, stylesheet) } as ArrayList<StyledNode>)
     }
 
     // Apply styles to a single element, returning the specified styles.
@@ -76,7 +76,7 @@ object Style {
         // rules.sortBy { i -> i!!.rule.declarations.toString() }
 
         for (rule in rules) {
-            if(rule != null) {
+            if (rule != null) {
                 for (declaration in rule.rule.declarations) {
                     values[declaration.name] = declaration.value
                 }
@@ -85,11 +85,8 @@ object Style {
         return values
     }
 
-    private fun matchingRules(elem: ElementData, stylesheet: Stylesheet): Vector<MatchedRule?> {
-        val filter: List<MatchedRule?> = stylesheet.rules.map { e -> matchRule(elem, e) }
-        val filter2 = Vector<MatchedRule?>()
-        filter2.addAll(filter)
-        return filter2
+    private fun matchingRules(elem: ElementData, stylesheet: Stylesheet): ArrayList<MatchedRule?> {
+        return stylesheet.rules.map { e -> matchRule(elem, e) } as ArrayList<MatchedRule?>
     }
 
     private fun matchRule(elem: ElementData, rule: Rule?): MatchedRule? {
@@ -117,7 +114,7 @@ object Style {
 
         // Check class selectors
         val elemClasses: HashSet<String> = elem.classes()
-        if (selector?._class != null &&selector._class.any { _class -> !elemClasses.contains(_class) }) {
+        if (selector?._class != null && selector._class.any { _class -> !elemClasses.contains(_class) }) {
             return false
         }
 

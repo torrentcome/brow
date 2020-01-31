@@ -4,9 +4,9 @@ import java.util.*
 import kotlin.reflect.KFunction1
 import kotlin.test.assertEquals
 
-data class Stylesheet(var rules: Vector<Rule>)
+data class Stylesheet(var rules: ArrayList<Rule>)
 
-data class Rule(var selectors: Vector<Selector>, var declarations: Vector<Declaration>)
+data class Rule(var selectors: ArrayList<Selector>, var declarations: ArrayList<Declaration>)
 
 abstract class Selector {
     abstract fun specificity(): Specificity
@@ -22,7 +22,7 @@ data class Simple(var simpleSelector: SimpleSelector) : Selector() {
     }
 }
 
-data class SimpleSelector(var tag_name: String?, var id: String?, var _class: Vector<String>)
+data class SimpleSelector(var tag_name: String?, var id: String?, var _class: ArrayList<String>)
 
 data class Declaration(var name: String, var value: Value)
 
@@ -64,14 +64,14 @@ object Css {
 
     data class Parser(var pos: Int, var input: String) {
         /// Parse a list of rule sets, separated by optional whitespace.
-        fun parseRules(): Vector<Rule> {
-            val rules = Vector<Rule>()
+        fun parseRules(): ArrayList<Rule> {
+            val rules = ArrayList<Rule>()
             loop@ while (true) {
                 consumeWhitespace()
                 if (eof()) {
                     break@loop
                 }
-                rules.addElement(parseRule())
+                rules.add(parseRule())
             }
             return rules
         }
@@ -80,10 +80,10 @@ object Css {
             return Rule(selectors = parseSelectors(), declarations = parseDeclarations())
         }
 
-        private fun parseSelectors(): Vector<Selector> {
-            val selectors = Vector<Selector>()
+        private fun parseSelectors(): ArrayList<Selector> {
+            val selectors = ArrayList<Selector>()
             loop@ while (true) {
-                selectors.addElement(Simple(parseSimpleSelector()))
+                selectors.add(Simple(parseSimpleSelector()))
                 consumeWhitespace()
                 when (val nextChar = nextChar()) {
                     ',' -> {
@@ -103,7 +103,7 @@ object Css {
         }
 
         private fun parseSimpleSelector(): SimpleSelector {
-            val selector = SimpleSelector(tag_name = null, id = null, _class = Vector())
+            val selector = SimpleSelector(tag_name = null, id = null, _class = ArrayList())
             loop@ while (!eof()) {
                 val nextChar = nextChar()
                 when {
@@ -113,7 +113,7 @@ object Css {
                     }
                     nextChar == '.' -> {
                         consumeChar()
-                        selector._class.addElement(parseIdentifier())
+                        selector._class.add(parseIdentifier())
                     }
                     nextChar == '*' -> {
                         consumeChar()
@@ -127,16 +127,16 @@ object Css {
             return selector
         }
 
-        private fun parseDeclarations(): Vector<Declaration> {
+        private fun parseDeclarations(): ArrayList<Declaration> {
             assertEquals('{', consumeChar())
-            val declarations = Vector<Declaration>()
+            val declarations = ArrayList<Declaration>()
             loop@ while (true) {
                 consumeWhitespace()
                 if (nextChar() == '}') {
                     consumeChar()
                     break@loop
                 }
-                declarations.addElement(parseDeclaration())
+                declarations.add(parseDeclaration())
             }
             return declarations
         }

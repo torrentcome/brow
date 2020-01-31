@@ -10,15 +10,15 @@ class HelloKotlin {
         fun main(args: Array<String>) {
 
             val rootDom = Node(
-                Vector(),
+                ArrayList(),
                 NodeType.Element(ElementData("html"))
             )
             val bodyDom = Node(
-                Vector(),
+                ArrayList(),
                 NodeType.Element(ElementData("body"))
             )
-            rootDom.children.addElement(bodyDom)
-            bodyDom.children.addElement(Dom.text("Hello, world!"))
+            rootDom.children.add(bodyDom)
+            bodyDom.children.add(Dom.text("Hello, world!"))
             println("* buildDom =")
             println("$rootDom")
 
@@ -31,10 +31,10 @@ class HelloKotlin {
             val rule1 = Rule(buildSelectors1(), buildDeclarations1())
             val rule2 = Rule(buildSelectors2(), buildDeclarations2())
             val rule3 = Rule(buildSelectors3(), buildDeclarations3())
-            val rules = Vector<Rule>()
-            rules.addElement(rule1)
-            rules.addElement(rule2)
-            rules.addElement(rule3)
+            val rules = ArrayList<Rule>()
+            rules.add(rule1)
+            rules.add(rule2)
+            rules.add(rule3)
             val stylesheet = Stylesheet(rules)
             println("* stylesheet = ")
             println("$stylesheet")
