@@ -36,11 +36,11 @@ data class Dimensions(
         return borderBox().expandedBy(margin)
     }
 
-    private fun borderBox(): Rect {
+    fun borderBox(): Rect {
        return paddingBox().expandedBy(border)
     }
 
-    private fun paddingBox(): Rect {
+    fun paddingBox(): Rect {
         return content.expandedBy(padding)
     }
 }
