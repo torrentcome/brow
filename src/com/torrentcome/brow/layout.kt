@@ -7,7 +7,7 @@ data class Rect(
         var width: Float = 0f,
         var height: Float = 0f
 ) {
-    fun expanded_by(edge: EdgeSizes): Rect {
+    fun expandedBy(edge: EdgeSizes): Rect {
         return Rect(
                 x = x - edge.left,
                 y = y - edge.top,
@@ -33,15 +33,15 @@ data class Dimensions(
         var margin: EdgeSizes = EdgeSizes()
 ) {
     fun marginBox(): Rect {
-        return borderBox().expanded_by(margin)
+        return borderBox().expandedBy(margin)
     }
 
     private fun borderBox(): Rect {
-       return paddingBox().expanded_by(border)
+       return paddingBox().expandedBy(border)
     }
 
     private fun paddingBox(): Rect {
-        return content.expanded_by(padding)
+        return content.expandedBy(padding)
     }
 }
 
@@ -49,7 +49,6 @@ abstract class BoxType
 class AnonymousBlock : BoxType()
 class InlineNode(var styledNode: StyledNode) : BoxType()
 class BlockNode(var styledNode: StyledNode) : BoxType()
-
 
 /// A node in the layout tree.
 data class LayoutBox(
@@ -81,11 +80,8 @@ data class LayoutBox(
             is BlockNode -> {
                 // If we've just generated an anonymous block box, keep using it.
                 // Otherwise, create a new one.
-                when (children.last().box_type) {
-                    is AnonymousBlock -> {
-                    }
-                    else -> children.add(LayoutBox(Dimensions(), AnonymousBlock(), ArrayList()))
-                }
+                if (children.isNotEmpty() && children.last().box_type is AnonymousBlock) { }
+                else children.add(LayoutBox(Dimensions(), AnonymousBlock(), ArrayList()))
                 children.last()
             }
             else -> this
